@@ -26,16 +26,15 @@ app.get("/api/status", (req, res) => {
 if (process.env.NODE_ENV === "production") {
     const frontendPath = path.join(__dirname, "frontend", "dist");
 
-    // Serve static files
+    // Serve static React files
     app.use(express.static(frontendPath));
 
-    // Catch-all for React frontend
-    app.get("*", (req, res, next) => {
+    // Serve React index.html for any route NOT starting with /api
+    app.get("*", (req, res) => {
         if (!req.path.startsWith("/api")) {
             res.sendFile(path.join(frontendPath, "index.html"));
         } else {
-            // Let Express handle unknown API routes
-            next();
+            res.status(404).json({ error: "API route not found" });
         }
     });
 }
