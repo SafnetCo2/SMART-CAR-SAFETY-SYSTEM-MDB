@@ -2,7 +2,7 @@
   "name": "smart-car-safety-system",
   "version": "1.0.0",
   "description": "",
-  "main": "backend/server.js",
+  "main": "server.js",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
@@ -13,8 +13,8 @@
     "undici-types": "^7.10.0"
   },
   "scripts": {
-    "start": "node backend/server.js",
-    "server": "nodemon backend/server.js",
+    "start": "node server.js",
+    "server": "nodemon server.js",
     "client": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
