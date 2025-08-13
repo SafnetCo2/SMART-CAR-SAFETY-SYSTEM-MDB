@@ -1,4 +1,3 @@
-// server.js
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -23,6 +22,14 @@ mongoose
     .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ==================== API ROUTES ====================
+// Since server.js is in root, routes are in backend/src/routes
+const driverRoutes = require("./backend/src/routes/drivers");
+const incidentRoutes = require("./backend/src/routes/incidents");
+
+app.use("/api/drivers", driverRoutes);
+app.use("/api/incidents", incidentRoutes);
+
+// ==================== STATUS ROUTE ====================
 app.get("/api/status", (req, res) => {
     res.json({ message: "Smart Car Safety Backend is running 🚗" });
 });
@@ -44,7 +51,7 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-// ==================== ROOT ENDPOINT (DEV) ====================
+// ==================== ROOT ENDPOINT ====================
 app.get("/", (req, res) => {
     res.send("Smart Car Safety & Diagnostic System Backend is running 🚗");
 });
@@ -53,6 +60,6 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(
-        `🚀 Server running in ${process.env.NODE_ENV || "production"} mode on port ${PORT}`
+        `🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`
     );
 });
