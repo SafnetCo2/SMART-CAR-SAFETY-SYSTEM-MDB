@@ -12,20 +12,15 @@ app.use(cors());
 app.use(express.json());
 
 // ==================== MONGODB CONNECTION ====================
-const mongoUri = process.env.MONGO_URI;
-
-if (!mongoUri) {
-    console.error("❌ MONGO_URI is not defined in environment variables");
-    process.exit(1);
-}
+const mongoURI = process.env.MONGO_URI;
 
 mongoose
-    .connect(mongoUri)
+    .connect(mongoURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
     .then(() => console.log("✅ MongoDB connected"))
-    .catch((err) => {
-        console.error("❌ MongoDB connection error:", err);
-        process.exit(1);
-    });
+    .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ==================== API ROUTES ====================
 app.get("/api/status", (req, res) => {
@@ -36,15 +31,15 @@ app.get("/api/status", (req, res) => {
 if (process.env.NODE_ENV === "production") {
     const frontendPath = path.join(__dirname, "frontend", "dist");
 
-    // Serve static files
+    // Serve static React files
     app.use(express.static(frontendPath));
 
-    // Catch-all to serve React frontend for non-API routes
-    app.get("*", (req, res, next) => {
+    // Catch-all: serve React app for non-API routes
+    app.get("*", (req, res) => {
         if (!req.path.startsWith("/api")) {
             res.sendFile(path.join(frontendPath, "index.html"));
         } else {
-            next();
+            res.status(404).json({ error: "API route not found" });
         }
     });
 }
@@ -57,5 +52,7 @@ app.get("/", (req, res) => {
 // ==================== START SERVER ====================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+    console.log(
+        `🚀 Server running in ${process.env.NODE_ENV || "production"} mode on port ${PORT}`
+    );
 });
