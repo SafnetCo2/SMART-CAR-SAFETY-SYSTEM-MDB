@@ -7,45 +7,45 @@ const path = require("path");
 
 const app = express();
 
-// Middleware
+// ==================== MIDDLEWARE ====================
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
+// ==================== MONGODB CONNECTION ====================
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log("✅ MongoDB connected"))
     .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Example API route
+// ==================== API ROUTES ====================
 app.get("/api/status", (req, res) => {
     res.json({ message: "Smart Car Safety Backend is running 🚗" });
 });
 
-// Serve frontend in production
+// ==================== SERVE FRONTEND IN PRODUCTION ====================
 if (process.env.NODE_ENV === "production") {
     const frontendPath = path.join(__dirname, "frontend", "dist");
 
     // Serve static files
     app.use(express.static(frontendPath));
 
-    // Catch-all to serve index.html for React routing
-    app.get("*", (req, res) => {
-        // Only serve index.html for non-API routes
+    // Catch-all for React frontend
+    app.get("*", (req, res, next) => {
         if (!req.path.startsWith("/api")) {
             res.sendFile(path.join(frontendPath, "index.html"));
         } else {
-            res.status(404).json({ error: "API route not found" });
+            // Let Express handle unknown API routes
+            next();
         }
     });
 }
 
-// Root endpoint for development
+// ==================== ROOT ENDPOINT (DEV) ====================
 app.get("/", (req, res) => {
     res.send("Smart Car Safety & Diagnostic System Backend is running 🚗");
 });
 
-// Start server
+// ==================== START SERVER ====================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(
